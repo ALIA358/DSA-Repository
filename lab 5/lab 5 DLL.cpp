@@ -1,75 +1,154 @@
-#include <iostream>
+#include<iostream>
 using namespace std;
 
-// Node structure
-struct Node {
+class Node {
+public:
     int data;
-    Node* prev;
     Node* next;
+    Node* prev;
+    Node(int val) {
+        data = val;
+        next = NULL;
+        prev = NULL;
+    }
 };
 
-// Doubly Linked List class
-class DoublyLinkedList {
-private:
+class linkedList {
+
     Node* head;
+    Node* tail;
 
 public:
-    DoublyLinkedList() {
-        head = nullptr;
+    linkedList() {
+        head = tail = NULL;
     }
 
-    // Append a node at the end
-    void append(int value) {
-        Node* newNode = new Node{value, nullptr, nullptr};
-
-        if (head == nullptr) {
-            head = newNode;
+    void push_front(int val) {
+        Node* newNode = new Node(val);
+        if (head == NULL) {
+            head = tail = newNode;
         } else {
-            Node* temp = head;
-            while (temp->next != nullptr)
-                temp = temp->next;
-
-            temp->next = newNode;
-            newNode->prev = temp;
+            newNode->next = head;
+            head->prev = newNode;
+            head = newNode;
         }
     }
 
-    // Display the list
-    void display() {
+    void pop_front() {
+        if (head == NULL) return;
+        Node* toDelete = head;
+        head = head->next;
+        if (head == NULL) tail = NULL;
+        else head->prev = NULL;
+        delete toDelete;
+    }
+
+    void printLL() {
         Node* temp = head;
-        if (temp == nullptr) {
-            cout << "The list is empty.\n";
+        while (temp != NULL) {
+            cout << temp->data << " -> ";
+            temp = temp->next;
+        }
+        cout << "NULL" << endl;
+    }
+
+    void insert(int val, int pos) {
+        if (pos < 0) {
+            cout << "Invalid position!" << endl;
+            return;
+        }
+        if (pos == 0) {
+            push_front(val);
             return;
         }
 
-        while (temp != nullptr) {
-            cout << temp->data;
-            if (temp->next != nullptr)
-                cout << " <-> ";
+        Node* temp = head;
+        for (int i = 0; i < pos - 1 && temp != NULL; i++) {
             temp = temp->next;
         }
-        cout << endl;
+
+        if (temp == NULL) {
+            cout << "Position out of range!" << endl;
+            return;
+        }
+
+        Node* newNode = new Node(val);
+        newNode->next = temp->next;
+        newNode->prev = temp;
+        if (temp->next != NULL) temp->next->prev = newNode;
+        temp->next = newNode;
+
+        if (newNode->next == NULL) {
+            tail = newNode;
+        }
+    }
+
+    void deleteNode(int pos) {
+        if (pos < 0) {
+            cout << "Invalid position!" << endl;
+            return;
+        }
+        if (head == NULL) {
+            cout << "List is empty!" << endl;
+            return;
+        }
+
+        if (pos == 0) {
+            pop_front();
+            return;
+        }
+
+        Node* temp = head;
+        for (int i = 0; i < pos - 1 && temp != NULL; i++) {
+            temp = temp->next;
+        }
+
+        if (temp == NULL || temp->next == NULL) {
+            cout << "Position out of range!" << endl;
+            return;
+        }
+
+        Node* toDelete = temp->next;
+        temp->next = toDelete->next;
+        if (toDelete->next != NULL) toDelete->next->prev = temp;
+        if (temp->next == NULL) tail = temp;
+        delete toDelete;
+    }
+
+    void search(int val) {
+        int index = 0;
+        Node* temp = head;
+        while (temp != NULL) {
+            if (temp->data == val) {
+                cout << index;
+            }
+            temp = temp->next;
+            index++;
+        }
     }
 };
 
 int main() {
-    DoublyLinkedList list;
-    int value;
+    linkedList ll;
 
-    cout << "Enter numbers to add to the list (enter -1 to stop):\n";
+    ll.push_front(1);
+    ll.push_front(2);
+    ll.push_front(3);
+    ll.push_front(4);
+    ll.push_front(5);
 
-    while (true) {
-        cout << "Enter a number: ";
-        cin >> value;
+    cout<<"Linked List \n";
+    ll.printLL();
 
-        if (value == -1)
-            break;
+    cout<<"\nInsertion \n";
+    ll.insert(10, 2);
+    ll.printLL();
 
-        list.append(value);
-    }
+    cout<<"\nDeletion \n";
+    ll.deleteNode(2);
+    ll.printLL();
 
-    cout << "\nDoubly Linked List: ";
-    list.display();
-
+    cout<<"\nSearch \n";
+    ll.search(3);
     return 0;
 }
